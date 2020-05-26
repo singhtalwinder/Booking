@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import connection from "../utils/DBConnection";
+import query from "../utils/mysqlQuery";
 
 export const User = {};
 
@@ -7,66 +7,24 @@ export const Query = {};
 
 export const Mutation = {
 	createUser: async (_, args) => {
-		const salt = await bcrypt.genSalt(10);
-		const hashedPassword = await bcrypt.hash(args.password, salt);
+		try {
+			const salt = await bcrypt.genSalt(10);
+			const hashedPassword = await bcrypt.hash(args.password, salt);
 
-		let user = [[args.email, hashedPassword]];
+			await query(`START TRANSACTION`);
+			await query(
+				`INSERT INTO user (email, password) VALUES ("${args.email}", "${hashedPassword}")`
+			);
+			let result = await query(`SELECT MAX(userId) AS userId FROM user`);
+			await query(`COMMIT`);
 
-		await new Promise(async (resolve, reject) => {
-			await new Promise((resolve, reject) => {
-				connection.query(`START TRANSACTIO`, (err, result) => {
-					if (err) return reject(err);
-					resolve(result);
-				});
-			}).catch((err) => {
-				return reject(err);
-			});
-
-			await new Promise((resolve, reject) => {
-				connection.query(
-					`INSERT INTO user (email, password) VALUES ?`,
-					[user],
-					(err, result) => {
-						if (err) return reject(err);
-						resolve(result);
-					}
-				);
-			}).catch((err) => {
-				return reject(err);
-			});
-
-			user = {
+			return {
+				userId: result[0].userId,
 				email: args.email,
-				userId: 0,
 			};
-
-			await new Promise((resolve, reject) => {
-				connection.query(
-					`SELECT MAX(userId) AS userId FROM user`,
-					(err, result) => {
-						if (err) return reject(err);
-						resolve(result);
-					}
-				);
-			})
-				.then((result) => {
-					user.userId = result[0].userId;
-					resolve(result);
-				})
-				.catch((err) => {
-					reject(err);
-				});
-		})
-			.then((result) => {
-				connection.query(`COMMIT`, (err, result) => {
-					if (err) throw err;
-				});
-			})
-			.catch((err) => {
-				console.log(err);
-				throw err;
-			});
-
-		return user;
+		} catch (err) {
+			console.log(err);
+			throw new Error("Internal server error");
+		}
 	},
 };
