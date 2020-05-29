@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import query from "../utils/mysqlQuery";
+import query from "../../utils/mysqlQuery";
 
 export const User = {};
 

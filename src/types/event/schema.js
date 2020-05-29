@@ -16,7 +16,7 @@ export const Types = `
 `;
 
 export const Queries = `
-    events: [Event!]!
+    events: [Event!]
 `;
 
 export const Mutations = `

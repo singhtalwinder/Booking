@@ -16,6 +16,6 @@ app.use(
 	})
 );
 
-app.listen(4000, async () => {
-	console.log("Running a GraphQL API server at localhost:4000/graphql");
+app.listen(4001, async () => {
+	console.log("Running a GraphQL API server at localhost:4001/graphql");
 });

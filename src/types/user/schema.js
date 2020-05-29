@@ -6,6 +6,9 @@ export const Types = `
     }
 `;
 
+export const Queries = `
+`;
+
 export const Mutations = `
     createUser(email: String!, password: String!): User!
 `;
