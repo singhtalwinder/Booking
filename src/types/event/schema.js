@@ -13,6 +13,8 @@ export const Types = `
         description: String!
         price: Float!
     }
+
+    union CreateEventResult = Event | InternalServerError
 `;
 
 export const Queries = `
@@ -20,5 +22,5 @@ export const Queries = `
 `;
 
 export const Mutations = `
-    createEvent(eventInput: EventInput): Event!
+    createEvent(eventInput: EventInput): CreateEventResult!
 `;

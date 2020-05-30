@@ -16,6 +16,14 @@ import {
 } from "./types/booking/schema";
 
 export default `
+    interface Error {
+        message: String!
+    }
+
+    type InternalServerError implements Error {
+        message: String!
+    }
+
     ${UserTypes}
     ${EventTypes}
     ${BookingTypes}

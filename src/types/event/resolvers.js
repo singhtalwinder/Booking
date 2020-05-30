@@ -3,20 +3,29 @@ import { getUserWithCreatedEvents } from "../../commonResolvers/getUserWithCreat
 
 export const Event = {
 	eventId: async (event) => {
-		if (event.eventId) return event.eventId;
-		let result = await query(
-			`SELECT * FROM event WHERE eventId = 
-            (SELECT MAX(eventId) FROM event);`
-		);
-		return result[0].eventId;
+		if (event.hasOwnProperty("eventId")) return event.eventId;
+		try {
+			let result = await query(
+				`SELECT * FROM event WHERE eventId = 
+				(SELECT MAX(eventId) FROM event);`
+			);
+			return result[0].eventId;
+		} catch (err) {
+			throw err;
+		}
 	},
 
 	registerDate: async (event) => {
-		if (!event.registerDate) return Date(event.registerDate);
-		let result = await query(
-			`SELECT * FROM event WHERE eventId = 
+		if (event.hasOwnProperty("registerDate")) return Date(event.registerDate);
+		let result;
+		try {
+			result = await query(
+				`SELECT * FROM event WHERE eventId = 
             (SELECT MAX(eventId) FROM event);`
-		);
+			);
+		} catch (err) {
+			throw err;
+		}
 		return Date(result[0].registerDate);
 	},
 
@@ -27,8 +36,12 @@ export const Event = {
 
 export const Query = {
 	events: async () => {
-		let result = await query(`SELECT * FROM event WHERE userId=${1}`);
-		return result;
+		try {
+			let result = await query(`SELECT * FROM event WHERE userId=${1}`);
+			return result;
+		} catch (err) {
+			throw new Error("InternalServerError");
+		}
 	},
 };
 
@@ -51,15 +64,17 @@ export const Mutation = {
 			);
 
 			return {
-				eventId: 0,
+				__typename: "Event",
 				title: args.eventInput.title,
 				description: args.eventInput.description,
 				price: args.eventInput.price,
-				registerDate: 0,
 			};
 		} catch (err) {
 			console.log(err);
-			throw new Error("Internal server error");
+			return {
+				__typename: "InternalServerError",
+				message: "A server error has occurred.",
+			};
 		}
 	},
 };

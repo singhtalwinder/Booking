@@ -4,11 +4,13 @@ export const Types = `
         email: String!
         createdEvents: [Event!]
     }
+
+    union CreateUserResult = User | InternalServerError
 `;
 
 export const Queries = `
 `;
 
 export const Mutations = `
-    createUser(email: String!, password: String!): User!
+    createUser(email: String!, password: String!): CreateUserResult!
 `;

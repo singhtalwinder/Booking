@@ -19,12 +19,16 @@ export const Mutation = {
 			await query(`COMMIT`);
 
 			return {
+				__typename: "User",
 				userId: result[0].userId,
 				email: args.email,
 			};
 		} catch (err) {
 			console.log(err);
-			throw new Error("Internal server error");
+			return {
+				__typename: "InternalServerError",
+				message: "A server error has occurred.",
+			};
 		}
 	},
 };

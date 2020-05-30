@@ -5,6 +5,21 @@ export const Types = `
         user: User!
         bookedAt: String!
     }
+
+    type EventNotFound implements Error {
+        message: String!
+    }
+
+    type AlreadyBooked implements Error {
+        message: String!
+    }
+
+    type BookingNotFound implements Error {
+        message: String!
+    }
+
+    union BookingResult = Booking | EventNotFound | AlreadyBooked | InternalServerError
+    union CancleBookingResult = Booking | BookingNotFound | InternalServerError
 `;
 
 export const Queries = `
@@ -12,6 +27,6 @@ export const Queries = `
 `;
 
 export const Mutations = `
-    bookEvent(eventId: ID!): Booking!
-    cancleBooking(eventId: ID!): Event!
+    bookEvent(eventId: ID!): BookingResult!
+    cancleBooking(eventId: ID!): CancleBookingResult!
 `;

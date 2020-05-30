@@ -21,6 +21,6 @@ export const getUserWithCreatedEvents = async (userId = 1) => {
 		return user;
 	} catch (err) {
 		console.log(err);
-		throw new Error("Internal server error");
+		throw err;
 	}
 };
