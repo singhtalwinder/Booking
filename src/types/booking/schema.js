@@ -18,8 +18,8 @@ export const Types = `
         message: String!
     }
 
-    union BookingResult = Booking | EventNotFound | AlreadyBooked | InternalServerError
-    union CancleBookingResult = Booking | BookingNotFound | InternalServerError
+    union BookingResult = Booking | EventNotFound | Unauthorized | AlreadyBooked | InternalServerError
+    union CancleBookingResult = Booking | BookingNotFound | Unauthorized | InternalServerError
 `;
 
 export const Queries = `

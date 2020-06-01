@@ -14,7 +14,7 @@ export const Types = `
         price: Float!
     }
 
-    union CreateEventResult = Event | InternalServerError
+    union CreateEventResult = Event | Unauthorized | InternalServerError
 `;
 
 export const Queries = `

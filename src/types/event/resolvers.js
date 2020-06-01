@@ -35,9 +35,14 @@ export const Event = {
 };
 
 export const Query = {
-	events: async () => {
+	events: async (_, args, req) => {
+		if (!req.isAuth) {
+			throw new Error("Unauthorized");
+		}
 		try {
-			let result = await query(`SELECT * FROM event WHERE userId=${1}`);
+			let result = await query(
+				`SELECT * FROM event WHERE userId=${req.userId}`
+			);
 			return result;
 		} catch (err) {
 			throw new Error("InternalServerError");
@@ -46,10 +51,16 @@ export const Query = {
 };
 
 export const Mutation = {
-	createEvent: async (_, args) => {
+	createEvent: async (_, args, req) => {
+		if (!req.isAuth) {
+			return {
+				__typename: "Unauthorized",
+				message: "You are not allowed to create events.",
+			};
+		}
 		let event = [
 			[
-				1,
+				req.userId,
 				args.eventInput.title,
 				args.eventInput.description,
 				args.eventInput.price,

@@ -11,7 +11,7 @@ export const Booking = {
 			let result = await query(
 				`SELECT *FROM EVENT WHERE eventId=${booking.eventId}`
 			);
-			result[0].creator = getUserWithCreatedEvents(1);
+			result[0].creator = getUserWithCreatedEvents(result[0].userId);
 			return result[0];
 		} catch (err) {
 			throw err;
@@ -38,9 +38,14 @@ export const Booking = {
 };
 
 export const Query = {
-	bookings: async () => {
+	bookings: async (_, args, req) => {
+		if (!req.isAuth) {
+			throw new Error("Unauthorized");
+		}
 		try {
-			let result = await query(`SELECT *FROM booking WHERE userId=${1}`);
+			let result = await query(
+				`SELECT *FROM booking WHERE userId=${req.userId}`
+			);
 			return result;
 		} catch (err) {
 			console.log(err);
@@ -50,7 +55,13 @@ export const Query = {
 };
 
 export const Mutation = {
-	bookEvent: async (_, args) => {
+	bookEvent: async (_, args, req) => {
+		if (!req.isAuth) {
+			return {
+				__typename: "Unauthorized",
+				message: "You are not allowed to book events.",
+			};
+		}
 		try {
 			await query(`START TRANSACTION`);
 
@@ -66,14 +77,14 @@ export const Mutation = {
 			}
 
 			await query(
-				`INSERT INTO booking (userID, eventId) VALUES (${1}, ${args.eventId})`
+				`INSERT INTO booking (userID, eventId) VALUES (${req.userId}, ${args.eventId})`
 			);
 
 			await query(`COMMIT`);
 
 			return {
 				__typename: "Booking",
-				userId: 1,
+				userId: req.userId,
 				eventId: args.eventId,
 			};
 		} catch (err) {
@@ -91,12 +102,18 @@ export const Mutation = {
 		}
 	},
 
-	cancleBooking: async (_, args) => {
+	cancleBooking: async (_, args, req) => {
+		if (!req.isAuth) {
+			return {
+				__typename: "Unauthorized",
+				message: "You are not allowed to create events.",
+			};
+		}
 		try {
 			await query(`START TRANSACTION`);
 			let result = await query(
 				`SELECT *FROM booking WHERE
-				userId=${1} AND eventId=${args.eventId}`
+				userId=${req.userId} AND eventId=${args.eventId}`
 			);
 
 			if (!result.length) {
@@ -108,14 +125,14 @@ export const Mutation = {
 
 			await query(
 				`DELETE FROM booking WHERE
-				userId=${1} AND eventId=${args.eventId}`
+				userId=${req.userId} AND eventId=${args.eventId}`
 			);
 
 			await query(`COMMIT`);
 
 			return {
 				__typename: "Booking",
-				userId: 1,
+				userId: req.userId,
 				eventId: result[0].eventId,
 				bookedAt: result[0].bookedAt,
 			};

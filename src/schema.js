@@ -1,5 +1,6 @@
 import {
 	Types as UserTypes,
+	Queries as UserQueries,
 	Mutations as UserMutations,
 } from "./types/user/schema";
 
@@ -24,11 +25,16 @@ export default `
         message: String!
     }
 
+    type Unauthorized implements Error {
+        message: String!
+    }
+
     ${UserTypes}
     ${EventTypes}
     ${BookingTypes}
 
     type Query {
+        ${UserQueries}
         ${EventQueries}
         ${BookingQueries}
     }
