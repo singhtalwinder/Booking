@@ -1,1 +1,0 @@
-Simple API in GRAPHQL
